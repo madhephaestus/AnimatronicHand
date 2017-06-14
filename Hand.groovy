@@ -15,7 +15,7 @@ class handMaker{
 	LengthParameter thumbSpread 		= new LengthParameter("Thumb Spread Angle",46,[20,0])
 	LengthParameter thickness 		= new LengthParameter("Material Thickness",3.15,[25.4,1])
 	LengthParameter boltLength		= new LengthParameter("Bolt Length",25,[180,10])
-	LengthParameter tendonOffset		= new LengthParameter("Tendon offset",10,[180,10])
+	LengthParameter tendonOffset		= new LengthParameter("Tendon offset",20,[180,10])
 	LengthParameter printerOffset 			= new LengthParameter("printerOffset",0.5,[1.2,0])
 	HashMap<String, Object>  boltMeasurments = Vitamins.getConfiguration( "capScrew",boltSizeParam.getStrValue())
 	CSG bolt = Vitamins.get( "capScrew",boltSizeParam.getStrValue())
@@ -23,7 +23,7 @@ class handMaker{
 	CSG makeMountLugBoltsCache = null
 	CSG makeMountLugCache = null
 	double lugRadius = (boltMeasurments.headDiameter*2+thickness.getMM())/2
-	
+	HashMap<Double,CSG> linkCache = new HashMap<>()
 	Transform getFingerLocation(int index){
 		Transform t= new Transform()
 		double percent=0
@@ -50,7 +50,7 @@ class handMaker{
 			percent= ((numberThumbs.getMM()-index-1)/(numberThumbs.getMM()-1))
 		else
 			percent=1.0
-		if(left.getStrValue().toLowerCase().contains("true")){
+		if(left.getStrValue().toLowerCase().contains("false")){
 			percent=1-percent
 			t.translateY(PalmWidth.getMM()-lowerPalmWidth.getMM())	
 		}
@@ -114,7 +114,10 @@ class handMaker{
 			makeMountLugCache=base.movez(thickness.getMM())
 							.union(base.movez(boltMeasurments.headDiameter+tendonOffset.getMM()))
 							.hull()
-							
+			makeMountLugCache=makeMountLugCache	
+							.union(makeLink(0)
+									.movez(makeMountLugCache.getMaxZ())
+							)
 		}
 		return makeMountLugCache
 	}
@@ -141,7 +144,21 @@ class handMaker{
 		return makeMountLugBoltsCache
 	}
 	CSG makeLink(double length){
-		
+		if(length<boltMeasurments.headDiameter){
+			length=boltMeasurments.headDiameter
+		}
+		if(linkCache.get(length)== null){
+			double radOfNuckel = tendonOffset.getMM()/2
+			CSG linknuckel =new Cylinder(radOfNuckel,radOfNuckel,thickness.getMM(),(int)10)
+								.toCSG() 
+								.rotx(90)
+			
+			CSG link = linknuckel
+						.union(linknuckel
+								.movex(-length))
+			linkCache.put(length,link)
+		}
+		return linkCache.get(length)
 	}
 	ArrayList<CSG> makeParts(){
 		ArrayList<CSG> parts = []
