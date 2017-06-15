@@ -207,8 +207,11 @@ class handMaker{
 				}
 		CSG strapSlot = new Cube(25.4,6.5,thickness.getMM()*4).toCSG()
 						.movex(-extentionLength.getMM()-endOfBoard +10)
-		strapSlot=strapSlot.union(	strapSlot.movex(35))		
-						.union(	strapSlot.movex(75))	
+		CSG strapSlotBlank=	strapSlot.clone()
+		for( int i=0;i<6;i++){
+			strapSlot=strapSlot.union(	strapSlotBlank.movex(35*i))		
+							
+		}
 		strapSlot=strapSlot.union(strapSlot.movey(lugRadius*8))
 		
 		CSG plate =CSG
