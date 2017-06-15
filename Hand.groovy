@@ -14,9 +14,10 @@ class handMaker{
 	LengthParameter fingerSpread 		= new LengthParameter("Finger Spread Angle",30,[20,0])
 	LengthParameter thumbSpread 		= new LengthParameter("Thumb Spread Angle",46,[20,0])
 	LengthParameter thickness 		= new LengthParameter("Material Thickness",3.15,[25.4,1])
-	LengthParameter boltLength		= new LengthParameter("Bolt Length",25,[180,10])
+	LengthParameter boltLength		= new LengthParameter("Bolt Length",65,[180,10])
 	LengthParameter tendonOffset		= new LengthParameter("Tendon offset",20,[180,10])
 	LengthParameter printerOffset 			= new LengthParameter("printerOffset",0.5,[1.2,0])
+	LengthParameter extentionLength 			= new LengthParameter("Extention Lngth",100,[500,0])
 	HashMap<String, Object>  boltMeasurments = Vitamins.getConfiguration( "capScrew",boltSizeParam.getStrValue())
 	CSG bolt = Vitamins.get( "capScrew",boltSizeParam.getStrValue())
 				.movez(printerOffset.getMM())
@@ -26,8 +27,25 @@ class handMaker{
 	double lugRadius = (boltMeasurments.headDiameter*2+thickness.getMM())/2
 	double linkBoltCenter =boltMeasurments.headDiameter+tendonOffset.getMM() -tendonOffset.getMM()/2-thickness.getMM()
 	HashMap<Double,CSG> linkCache = new HashMap<>()
+	ArrayList<Transform> digitLugs(){
+		ArrayList<Transform> lugs =[]
+		double total = (numberThumbs.getMM()+numberFingers.getMM())
+		for(int i=0;i<total;i++){
+			Transform t= new Transform()
+			double percent=0
+			if(total>1)
+				percent= ((total-i-1)/(total-1))
+			else
+				percent=1.0
+			t.translateX(-extentionLength.getMM())
+			t.translateY(((lugRadius*8+2)*percent) )
+			lugs.add(t)
+		}
+		return lugs
+	}
 	Transform getFingerLocation(int index){
 		Transform t= new Transform()
+		
 		double percent=0
 		if(numberFingers.getMM()>1)
 			percent= ((numberFingers.getMM()-index-1)/(numberFingers.getMM()-1))
@@ -76,6 +94,9 @@ class handMaker{
 
 	ArrayList<CSG> makePalm(){
 		ArrayList<Transform> corners = []
+		ArrayList<Transform> handLugs = digitLugs()
+		
+		//corners.addAll(handLugs)
 		CSG corner = makeMountBase()
 		CSG lug = makeMountLug()
 		for (int i=0;i<numberFingers.getMM();i++){
@@ -84,21 +105,32 @@ class handMaker{
 		for (int i=0;i<numberThumbs.getMM();i++){
 			corners.add(getThumbLocation(i))
 		}
+		for(Transform t:handLugs){
+			corners.add(t)
+		}
 		ArrayList<CSG> parts = corners.collect{
 			return corner.transformed(it)
 		}
+		parts.addAll(handLugs.collect{
+			return corner.movex(-200).transformed(it)
+						
+		})
 		CSG boltOffset =makeMountLugBolts().toolOffset(printerOffset.getMM())
-		ArrayList<CSG> lugs = corners.collect{
-			return lug
+		CSG cutLug=lug
 					.difference(boltOffset)
+		ArrayList<CSG> lugs = corners.collect{
+			return cutLug
 					.transformed(it)
 		}
+		ArrayList<CSG> bolts=corners.collect{
+					return makeMountLugBolts().transformed(it)
+				}
 		CSG plate =CSG
 				.unionAll(parts)
 				.hull() 
-				.difference(corners.collect{
-					return makeMountLugBolts().transformed(it)
-				})
+		CSG intersectingParts = plate
+				.intersect(bolts)
+		plate=plate.difference(intersectingParts)
 		lugs.add(plate)
 		return lugs
 		
@@ -117,6 +149,7 @@ class handMaker{
 	
 	CSG makeMountBase(){
 		return  new Cube(lugRadius*2,lugRadius*2,thickness.getMM())
+				//.cornerRadius(0.5)
 				.toCSG() // a one line Cylinder
 				.toZMax()
 				.movex(lugRadius*0.5)
@@ -139,6 +172,12 @@ class handMaker{
 							.difference(makeCableLug()
 									.roty(90)
 									.movez(linkBoltCenter+(tendonOffset.getMM()/2))
+									.movex((tendonOffset.getMM()/2)+3)
+									
+							)
+							.difference(makeCableLug()
+									.roty(90)
+									.movez(linkBoltCenter-(tendonOffset.getMM()/2))
 									.movex((tendonOffset.getMM()/2)+3)
 									
 							)
@@ -202,5 +241,5 @@ class handMaker{
 		return parts
 	}
 }
-//new handMaker().makePalm()
-new handMaker().makeMountLug()
+new handMaker().makePalm()
+//new handMaker().makeMountLug()
