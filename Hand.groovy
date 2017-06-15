@@ -137,8 +137,8 @@ class handMaker{
 	}
 	CSG makeCableLug(){
 		if(cableLugCache==null){
-			CSG cable =new Cylinder(0.8,0.8,80,(int)10).toCSG() // a one line Cylinder
-			CSG housing =new Cylinder(2.45,2.45,20,(int)10).toCSG() // a one line Cylinder	
+			CSG cable =new Cylinder(0.8,0.8,80,(int)6).toCSG() // a one line Cylinder
+			CSG housing =new Cylinder(2.5,2.5,20,(int)6).toCSG() // a one line Cylinder	
 							.movez(-20)
 			cable=cable.union(housing)
 					
