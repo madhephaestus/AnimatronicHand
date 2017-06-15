@@ -27,6 +27,7 @@ class handMaker{
 	double lugRadius = (boltMeasurments.headDiameter*2+thickness.getMM())/2
 	double linkBoltCenter =boltMeasurments.headDiameter+tendonOffset.getMM() -tendonOffset.getMM()/2-thickness.getMM()
 	double endOfBoard = 200
+	double radOfNuckel = tendonOffset.getMM()/2
 	HashMap<Double,CSG> linkCache = new HashMap<>()
 	ArrayList<Transform> digitLugs(){
 		ArrayList<Transform> lugs =[]
@@ -119,15 +120,48 @@ class handMaker{
 		}
 	}
 	ArrayList<CSG> makeDiget(int numLinks,double linkLen){
-
+		CSG midLinkHole = new Cylinder(0.7,0.7,thickness.getMM()*6,(int)10)
+								.toCSG() 
+								.movez(-thickness.getMM()*1.5)
+								.rotx(90)
+								.movex(-linkLen/2)
+								.movez(radOfNuckel-3)
+		midLinkHole=midLinkHole.union(midLinkHole.rotx(180))
 		ArrayList<CSG> links = []
 		for(int i=0;i<numLinks;i++){
 			CSG link = makeLink(linkLen)
-						.movex(-linkLen*i)
-						.movez(linkBoltCenter)
+			Transform	location = new Transform()
+			location.translateX(-linkLen*i)
+			location.translateZ(	linkBoltCenter)	
 			if(i%2!=0){
-				link=link.movey(thickness.getMM())			
+				CSG fingerStop = new Cube(linkLen+	tendonOffset.getMM(),thickness.getMM(),	tendonOffset.getMM()+5).toCSG()
+							.toXMax()
+							.movex(tendonOffset.getMM()/2)
+							.movez(-2.5)
+							
+				CSG previous = link.rotz(180).roty(5)
+						.union(link.rotz(180).roty(30))
+						.union(link.rotz(180).roty(60))
+						.union(link.rotz(180).roty(90))
+						.hull()
+						//.movex(linkLen)
+				CSG next = link.roty(-5)
+						.union(link.roty(-30))
+						.union(link.roty(-60))
+						.union(link.roty(-90))
+						.hull()
+						.movex(-linkLen)
+				fingerStop=fingerStop
+						.difference(next)
+						.difference(previous)
+						.difference(midLinkHole)
+				links.add( fingerStop.transformed(location))
+				link=link.movey(thickness.getMM())
+				//link=link.union(fingerStop)	
 			}
+			link=link
+				.difference(midLinkHole)
+				.transformed(location)
 			links.add( link)
 		}
 		return links
@@ -260,14 +294,8 @@ class handMaker{
 			length=boltMeasurments.headDiameter
 		}
 		if(linkCache.get(length)== null){
-			double radOfNuckel = tendonOffset.getMM()/2
-			CSG midLinkHole = new Cylinder(0.7,0.7,thickness.getMM()*3,(int)10)
-								.toCSG() 
-								.movez(-thickness.getMM()*1.5)
-								.rotx(90)
-								.movex(-length/2)
-								.movez(radOfNuckel-3)
-			midLinkHole=midLinkHole.union(midLinkHole.rotx(180))
+			
+			
 			CSG linknuckel =new Cylinder(radOfNuckel,radOfNuckel,thickness.getMM(),(int)10)
 								.toCSG() 
 								.rotx(90)
@@ -279,7 +307,7 @@ class handMaker{
 								.movex(-length))
 						.hull()
 						.difference(bolts)
-						.difference(midLinkHole)
+						
 						.movey(-thickness.getMM()/2)
 			linkCache.put(length,link)
 		}
