@@ -26,7 +26,7 @@ class handMaker{
 	CSG cableLugCache = null
 	double lugRadius = (boltMeasurments.headDiameter*2+thickness.getMM())/2
 	double linkBoltCenter =boltMeasurments.headDiameter+tendonOffset.getMM() -tendonOffset.getMM()/2-thickness.getMM()
-	double endOfBoard = 200
+	double endOfBoard = 300
 	double radOfNuckel = tendonOffset.getMM()/2
 	HashMap<Double,CSG> linkCache = new HashMap<>()
 	ArrayList<Transform> digitLugs(){
@@ -93,7 +93,7 @@ class handMaker{
 		return makeDiget(linksPer,linkLen).collect{
 			return it.transformed(getThumbLocation(index))
 					.setManufacturing({ toMfg ->
-								TransformNR step = com.neuronrobotics.bowlerstudio.physics.TransformFactory.csgToNR(getFingerLocation(index)).inverse()
+								TransformNR step = com.neuronrobotics.bowlerstudio.physics.TransformFactory.csgToNR(getThumbLocation(index)).inverse()
 								Transform move = com.neuronrobotics.bowlerstudio.physics.TransformFactory.nrToCSG(step)
 								return toMfg
 										.transformed(move)
@@ -190,6 +190,11 @@ class handMaker{
 			return corner.movex(-endOfBoard).transformed(it)
 						
 		})
+		
+		ArrayList<CSG> springBolts =handLugs.collect{
+			return bolt.movex(-endOfBoard+220).transformed(it)
+						
+		}
 		CSG boltOffset =makeMountLugBolts().toolOffset(printerOffset.getMM())
 		CSG cutLug=lug
 					.difference(boltOffset)
@@ -205,6 +210,7 @@ class handMaker{
 		strapSlot=strapSlot.union(	strapSlot.movex(35))		
 						.union(	strapSlot.movex(75))	
 		strapSlot=strapSlot.union(strapSlot.movey(lugRadius*8))
+		
 		CSG plate =CSG
 				.unionAll(parts)
 				.hull() 
@@ -212,7 +218,9 @@ class handMaker{
 		CSG intersectingParts = plate
 				.intersect(bolts)
 		plate=plate.difference(intersectingParts)
+				.difference(springBolts)
 				.movez(1)
+				
 		lugs.add(plate)
 		return lugs
 		
