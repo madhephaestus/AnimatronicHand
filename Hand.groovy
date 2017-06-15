@@ -26,6 +26,7 @@ class handMaker{
 	CSG cableLugCache = null
 	double lugRadius = (boltMeasurments.headDiameter*2+thickness.getMM())/2
 	double linkBoltCenter =boltMeasurments.headDiameter+tendonOffset.getMM() -tendonOffset.getMM()/2-thickness.getMM()
+	double endOfBoard = 200
 	HashMap<Double,CSG> linkCache = new HashMap<>()
 	ArrayList<Transform> digitLugs(){
 		ArrayList<Transform> lugs =[]
@@ -134,7 +135,7 @@ class handMaker{
 			return corner.transformed(it)
 		}
 		parts.addAll(handLugs.collect{
-			return corner.movex(-200).transformed(it)
+			return corner.movex(-endOfBoard).transformed(it)
 						
 		})
 		CSG boltOffset =makeMountLugBolts().toolOffset(printerOffset.getMM())
@@ -147,9 +148,15 @@ class handMaker{
 		ArrayList<CSG> bolts=corners.collect{
 					return makeMountLugBolts().transformed(it)
 				}
+		CSG strapSlot = new Cube(25.4,6.5,thickness.getMM()*4).toCSG()
+						.movex(-extentionLength.getMM()-endOfBoard +10)
+		strapSlot=strapSlot.union(	strapSlot.movex(35))		
+						.union(	strapSlot.movex(75))	
+		strapSlot=strapSlot.union(strapSlot.movey(lugRadius*8))
 		CSG plate =CSG
 				.unionAll(parts)
 				.hull() 
+				.difference(strapSlot)
 		CSG intersectingParts = plate
 				.intersect(bolts)
 		plate=plate.difference(intersectingParts)
