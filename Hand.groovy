@@ -215,16 +215,16 @@ class handMaker{
 			makeMountLugBoltsCache=bolt
 								.movey(boltOffset)
 								.movex(boltMeasurments.headDiameter)
+								.movez(lug.getMaxZ())
 								.union(bolt
 									.movey(-boltOffset)
 									.movex(boltMeasurments.headDiameter)
+									.movez(lug.getMaxZ())
 								).union(bolt
 									.rotx(90)
-									.toZMax()
 									.movey(lugRadius)
-									.movez(-tendonOffset.getMM()/2)
 								)
-								.movez(lug.getMaxZ())
+								.movez(linkBoltCenter)
 								
 		}
 		
