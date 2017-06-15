@@ -131,6 +131,7 @@ class handMaker{
 		CSG intersectingParts = plate
 				.intersect(bolts)
 		plate=plate.difference(intersectingParts)
+				.movez(1)
 		lugs.add(plate)
 		return lugs
 		
@@ -213,13 +214,25 @@ class handMaker{
 		}
 		if(linkCache.get(length)== null){
 			double radOfNuckel = tendonOffset.getMM()/2
+			CSG midLinkHole = new Cylinder(0.7,0.7,thickness.getMM()*3,(int)10)
+								.toCSG() 
+								.movez(-thickness.getMM()*1.5)
+								.rotx(90)
+								.movex(-length/2)
+								.movez(radOfNuckel-3)
+			midLinkHole=midLinkHole.union(midLinkHole.rotx(180))
 			CSG linknuckel =new Cylinder(radOfNuckel,radOfNuckel,thickness.getMM(),(int)10)
 								.toCSG() 
 								.rotx(90)
 			
+			CSG bolts = bolt.rotx(-90)
+			bolts=bolts.union(bolts.movex(-length))
 			CSG link = linknuckel
 						.union(linknuckel
 								.movex(-length))
+						.hull()
+						.difference(bolts)
+						.difference(midLinkHole)
 						.movey(-thickness.getMM()/2)
 			linkCache.put(length,link)
 		}
@@ -242,5 +255,5 @@ class handMaker{
 		return parts
 	}
 }
-new handMaker().makePalm()
+new handMaker().makeLink(40)
 //new handMaker().makeMountLug()
