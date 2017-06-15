@@ -22,7 +22,9 @@ class handMaker{
 				.movez(printerOffset.getMM())
 	CSG makeMountLugBoltsCache = null
 	CSG makeMountLugCache = null
+	CSG cableLugCache = null
 	double lugRadius = (boltMeasurments.headDiameter*2+thickness.getMM())/2
+	double linkBoltCenter =boltMeasurments.headDiameter+tendonOffset.getMM() -tendonOffset.getMM()/2-thickness.getMM()
 	HashMap<Double,CSG> linkCache = new HashMap<>()
 	Transform getFingerLocation(int index){
 		Transform t= new Transform()
@@ -101,6 +103,17 @@ class handMaker{
 		return lugs
 		
 	}
+	CSG makeCableLug(){
+		if(cableLugCache==null){
+			CSG cable =new Cylinder(0.8,0.8,80,(int)10).toCSG() // a one line Cylinder
+			CSG housing =new Cylinder(2,2,20,(int)10).toCSG() // a one line Cylinder	
+							.movez(-20)
+			cable=cable.union(housing)
+					
+			cableLugCache=cable
+		}
+		return cableLugCache
+	}
 	
 	CSG makeMountBase(){
 		return  new Cube(lugRadius*2,lugRadius*2,thickness.getMM())
@@ -115,8 +128,19 @@ class handMaker{
 							.union(base.movez(boltMeasurments.headDiameter+tendonOffset.getMM()))
 							.hull()
 			makeMountLugCache=makeMountLugCache	
-							.union(makeLink(0)
-									.movez(makeMountLugCache.getMaxZ())
+							.difference(makeLink(0)
+									.union(makeLink(0).roty(-30))
+									.union(makeLink(0).roty(-60))
+									.union(makeLink(0).roty(-90))
+									.toolOffset(printerOffset.getMM())
+									//.movez(makeMountLugCache.getMaxZ())
+									.movez(linkBoltCenter)
+							)
+							.difference(makeCableLug()
+									.roty(90)
+									.movez(linkBoltCenter+(tendonOffset.getMM()/2))
+									.movex((tendonOffset.getMM()/2)+3)
+									
 							)
 		}
 		return makeMountLugCache
@@ -178,4 +202,5 @@ class handMaker{
 		return parts
 	}
 }
-new handMaker().makePalm()
+//new handMaker().makePalm()
+new handMaker().makeMountLug()
