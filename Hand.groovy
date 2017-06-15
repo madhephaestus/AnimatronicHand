@@ -165,6 +165,7 @@ class handMaker{
 									.union(makeLink(0).roty(-30))
 									.union(makeLink(0).roty(-60))
 									.union(makeLink(0).roty(-90))
+									.hull()
 									.toolOffset(printerOffset.getMM())
 									//.movez(makeMountLugCache.getMaxZ())
 									.movez(linkBoltCenter)
