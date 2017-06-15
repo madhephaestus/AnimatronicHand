@@ -262,16 +262,11 @@ class handMaker{
 	}
 	ArrayList<CSG> makeParts(){
 		ArrayList<CSG> parts = []
-		
 		for (int i=0;i<numberFingers.getMM();i++){
-			for(CSG bit: makeFinger(i)){
-				parts.add(bit)
-			}
+			parts.addAll(makeFinger(i))
 		}
 		for (int i=0;i<numberThumbs.getMM();i++){
-			for(CSG bit: makeThumb(i)){
-				parts.add(bit)
-			}
+			parts.addAll(makeThumb(i))
 		}
 		parts.addAll( makePalm())
 		
