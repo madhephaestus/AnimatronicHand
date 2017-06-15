@@ -148,7 +148,7 @@ class handMaker{
 	}
 	
 	CSG makeMountBase(){
-		return  new Cube(lugRadius*2,lugRadius*2,thickness.getMM())
+		return  new Cube(lugRadius*2.5,lugRadius*2,thickness.getMM())
 				//.cornerRadius(0.5)
 				.toCSG() // a one line Cylinder
 				.toZMax()
