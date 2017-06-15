@@ -156,6 +156,7 @@ class handMaker{
 			CSG link = linknuckel
 						.union(linknuckel
 								.movex(-length))
+						.movey(-thickness.getMM()/2)
 			linkCache.put(length,link)
 		}
 		return linkCache.get(length)
