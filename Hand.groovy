@@ -90,14 +90,32 @@ class handMaker{
 		int linksPer = 2
 		double linkLen = thumbLength.getMM()/linksPer
 		return makeDiget(linksPer,linkLen).collect{
-			it.transformed(getThumbLocation(index))
+			return it.transformed(getThumbLocation(index))
+					.setManufacturing({ toMfg ->
+								TransformNR step = com.neuronrobotics.bowlerstudio.physics.TransformFactory.csgToNR(getFingerLocation(index)).inverse()
+								Transform move = com.neuronrobotics.bowlerstudio.physics.TransformFactory.nrToCSG(step)
+								return toMfg
+										.transformed(move)
+										.rotx(90)
+										.toXMin()
+										.toZMin()
+					})
 		}
 	}
 	ArrayList<CSG> makeFinger(int index){
 		int linksPer = 3
 		double linkLen = fingerLength.getMM()/linksPer
 		return makeDiget(linksPer,linkLen).collect{
-			it.transformed(getFingerLocation(index))
+			return it.transformed(getFingerLocation(index))
+					.setManufacturing({ toMfg ->
+						TransformNR step = com.neuronrobotics.bowlerstudio.physics.TransformFactory.csgToNR(getFingerLocation(index)).inverse()
+						Transform move = com.neuronrobotics.bowlerstudio.physics.TransformFactory.nrToCSG(step)
+						return toMfg
+								.transformed(move)
+								.rotx(90)
+								.toXMin()
+								.toZMin()
+					})
 		}
 	}
 	ArrayList<CSG> makeDiget(int numLinks,double linkLen){
