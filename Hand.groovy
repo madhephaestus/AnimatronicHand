@@ -86,10 +86,32 @@ class handMaker{
 	}
 	
 	ArrayList<CSG> makeThumb(int index){
-		
+		int linksPer = 2
+		double linkLen = thumbLength.getMM()/linksPer
+		return makeDiget(linksPer,linkLen).collect{
+			it.transformed(getThumbLocation(index))
+		}
 	}
 	ArrayList<CSG> makeFinger(int index){
-		
+		int linksPer = 3
+		double linkLen = fingerLength.getMM()/linksPer
+		return makeDiget(linksPer,linkLen).collect{
+			it.transformed(getFingerLocation(index))
+		}
+	}
+	ArrayList<CSG> makeDiget(int numLinks,double linkLen){
+
+		ArrayList<CSG> links = []
+		for(int i=0;i<numLinks;i++){
+			CSG link = makeLink(linkLen)
+						.movex(-linkLen*i)
+						.movez(linkBoltCenter)
+			if(i%2!=0){
+				link=link.movey(thickness.getMM())			
+			}
+			links.add( link)
+		}
+		return links
 	}
 
 	ArrayList<CSG> makePalm(){
@@ -251,9 +273,10 @@ class handMaker{
 				parts.add(bit)
 			}
 		}
+		parts.addAll( makePalm())
 		
 		return parts
 	}
 }
-new handMaker().makeLink(40)
+new handMaker().makeParts()
 //new handMaker().makeMountLug()
