@@ -187,7 +187,7 @@ class handMaker{
 				.difference(previous)
 				.difference(midLinkHole)
 				.difference(bolts)
-				.union(cable)
+				.difference(cable)
 		return fingerStop
 				
 	}
