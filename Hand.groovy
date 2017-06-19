@@ -134,8 +134,8 @@ class handMaker{
 			location.translateX(-linkLen*i)
 			location.translateZ(	linkBoltCenter)	
 			if(i%2!=0){
-				links.add( makeFingerStop( link,midLinkHole,linkLen).transformed(location))
-				link=link.movey(thickness.getMM())
+				
+				link=makeFingerStop( link,midLinkHole,linkLen)
 				//link=link.union(fingerStop)	
 			}
 			link=link
@@ -150,7 +150,7 @@ class handMaker{
 		double backstopOffset = 5
 		CSG bolts = bolt.rotx(-90)
 		bolts=bolts.union(bolts.movex(-linkLen))
-		CSG linknuckel =new Cylinder(radOfNuckel+5,radOfNuckel+backstopOffset,thickness.getMM()*2,(int)10)
+		CSG linknuckel =new Cylinder(radOfNuckel+backstopOffset,radOfNuckel+backstopOffset,thickness.getMM()*2,(int)10)
 								.toCSG() 
 								.movez(-thickness.getMM()/2)
 								
@@ -162,7 +162,7 @@ class handMaker{
 						.hull()
 			.toXMax()
 			.movex(tendonOffset.getMM()/2+backstopOffset)
-			.movez(-backstopOffset/2)
+
 					
 		CSG previous = link.rotz(180).roty(10)
 				.union(link.rotz(180).roty(30))
@@ -176,11 +176,19 @@ class handMaker{
 				.union(link.roty(-90))
 				.hull()
 				.movex(-linkLen)
+
+		CSG cable =new Cylinder(0.8,0.8,linkLen+tendonOffset.getMM()*2,(int)6).toCSG() // a one line Cylinder
+					.movez(-tendonOffset.getMM())
+					.roty(90)
+					.movez(-tendonOffset.getMM()/2-backstopOffset/3)
+		cable=cable.union(cable.rotx(180))			
 		fingerStop=fingerStop
 				.difference(next)
 				.difference(previous)
 				.difference(midLinkHole)
 				.difference(bolts)
+				.union(cable)
+		return fingerStop
 				
 	}
 
