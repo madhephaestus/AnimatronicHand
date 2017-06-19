@@ -134,28 +134,7 @@ class handMaker{
 			location.translateX(-linkLen*i)
 			location.translateZ(	linkBoltCenter)	
 			if(i%2!=0){
-				CSG fingerStop = new Cube(linkLen+	tendonOffset.getMM(),thickness.getMM(),	tendonOffset.getMM()+5).toCSG()
-							.toXMax()
-							.movex(tendonOffset.getMM()/2)
-							.movez(-2.5)
-							
-				CSG previous = link.rotz(180).roty(10)
-						.union(link.rotz(180).roty(30))
-						.union(link.rotz(180).roty(60))
-						.union(link.rotz(180).roty(90))
-						.hull()
-						//.movex(linkLen)
-				CSG next = link.roty(-10)
-						.union(link.roty(-30))
-						.union(link.roty(-60))
-						.union(link.roty(-90))
-						.hull()
-						.movex(-linkLen)
-				fingerStop=fingerStop
-						.difference(next)
-						.difference(previous)
-						.difference(midLinkHole)
-				links.add( fingerStop.transformed(location))
+				links.add( makeFingerStop( link,midLinkHole,linkLen).transformed(location))
 				link=link.movey(thickness.getMM())
 				//link=link.union(fingerStop)	
 			}
@@ -165,6 +144,44 @@ class handMaker{
 			links.add( link)
 		}
 		return links
+	}
+
+	CSG makeFingerStop(CSG link,CSG midLinkHole,double linkLen){
+		double backstopOffset = 5
+		CSG bolts = bolt.rotx(-90)
+		bolts=bolts.union(bolts.movex(-linkLen))
+		CSG linknuckel =new Cylinder(radOfNuckel+5,radOfNuckel+backstopOffset,thickness.getMM()*2,(int)10)
+								.toCSG() 
+								.movez(-thickness.getMM()/2)
+								
+								.rotx(90)
+								.movex(backstopOffset)
+			
+		CSG fingerStop = linknuckel
+						.union(linknuckel.movex(linkLen))
+						.hull()
+			.toXMax()
+			.movex(tendonOffset.getMM()/2+backstopOffset)
+			.movez(-backstopOffset/2)
+					
+		CSG previous = link.rotz(180).roty(10)
+				.union(link.rotz(180).roty(30))
+				.union(link.rotz(180).roty(60))
+				.union(link.rotz(180).roty(90))
+				.hull()
+				//.movex(linkLen)
+		CSG next = link.roty(-10)
+				.union(link.roty(-30))
+				.union(link.roty(-60))
+				.union(link.roty(-90))
+				.hull()
+				.movex(-linkLen)
+		fingerStop=fingerStop
+				.difference(next)
+				.difference(previous)
+				.difference(midLinkHole)
+				.difference(bolts)
+				
 	}
 
 	ArrayList<CSG> makePalm(){
