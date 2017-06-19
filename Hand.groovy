@@ -28,6 +28,7 @@ class handMaker{
 	double linkBoltCenter =boltMeasurments.headDiameter+tendonOffset.getMM() -tendonOffset.getMM()/2-thickness.getMM()
 	double endOfBoard = 300
 	double radOfNuckel = tendonOffset.getMM()/2
+	double maxCurlAngle = 80
 	HashMap<Double,CSG> linkCache = new HashMap<>()
 	ArrayList<Transform> digitLugs(){
 		ArrayList<Transform> lugs =[]
@@ -167,13 +168,13 @@ class handMaker{
 		CSG previous = link.rotz(180).roty(10)
 				.union(link.rotz(180).roty(30))
 				.union(link.rotz(180).roty(60))
-				.union(link.rotz(180).roty(90))
+				.union(link.rotz(180).roty(maxCurlAngle))
 				.hull()
 				//.movex(linkLen)
 		CSG next = link.roty(-10)
 				.union(link.roty(-30))
 				.union(link.roty(-60))
-				.union(link.roty(-90))
+				.union(link.roty(-maxCurlAngle))
 				.hull()
 				.movex(-linkLen)
 
@@ -282,7 +283,7 @@ class handMaker{
 							.difference(makeLink(0)
 									.union(makeLink(0).roty(-30))
 									.union(makeLink(0).roty(-60))
-									.union(makeLink(0).roty(-90))
+									.union(makeLink(0).roty(-maxCurlAngle))
 									.hull()
 									.toolOffset(printerOffset.getMM())
 									//.movez(makeMountLugCache.getMaxZ())
