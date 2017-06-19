@@ -11,7 +11,7 @@ class handMaker{
 	LengthParameter thumbLength 		= new LengthParameter("Thumb Length",400/3,[130.0,2.0])
 	LengthParameter fingerDelta 		= new LengthParameter("Finger Delta",15,[50,0])
 	StringParameter boltSizeParam 	= new StringParameter("Bolt Size","M5",Vitamins.listVitaminSizes("capScrew"))
-	LengthParameter fingerSpread 		= new LengthParameter("Finger Spread Angle",20,[20,0])
+	LengthParameter fingerSpread 		= new LengthParameter("Finger Spread Angle",10,[20,0])
 	LengthParameter thumbSpread 		= new LengthParameter("Thumb Spread Angle",46,[20,0])
 	LengthParameter thickness 		= new LengthParameter("Material Thickness",5.1,[25.4,1])
 	LengthParameter boltLength		= new LengthParameter("Bolt Length",65,[180,10])
