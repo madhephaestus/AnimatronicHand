@@ -8,7 +8,7 @@ CSG shoulderB =corner.toYMin().movey(-soulderSeperation)
 CSG shoulder = shoulderA
 				.union(shoulderB)
 double shoulderInset = 40	
-double chestDepth = 150		
+double chestDepth = 6.5*25.4		
 CSG shoulderMountA = corner.rotx(90).movey(15*25.4-shoulderInset)
 				.scalex(1.5)
 				.scalez(0.9)
