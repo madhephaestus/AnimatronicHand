@@ -8,7 +8,7 @@ CSG shoulderB =corner.toYMin().movey(-soulderSeperation)
 CSG shoulder = shoulderA
 				.union(shoulderB)
 double shoulderInset = 40	
-double chestDepth = 200-	2.5*25.4		
+double chestDepth = 150		
 CSG shoulderMountA = corner.rotx(90).movey(15*25.4-shoulderInset)
 				.scalex(1.5)
 				.scalez(0.9)
@@ -22,12 +22,14 @@ CSG plate = corner
 CSG upper = new Cube(10000).toCSG().toZMin()
 			.movez(plate.getMaxZ())
 			
-CSG clavicleA = corner.movey(soulderSeperation/2)
-				.roty(90)
+CSG clavicleA = corner.movey(soulderSeperation/3)
+				.roty(90)				
+				.toZMin()
 				.movez(chestDepth)
 				.movex(shoulderPos)
-CSG clavicleB = corner.movey(-soulderSeperation/2)
+CSG clavicleB = corner.movey(-soulderSeperation/3)
 				.roty(90)
+				.toZMin()
 				.movez(chestDepth)
 				.movex(shoulderPos)	
 CSG centerClavicle = 	clavicleA.union(clavicleB).hull()			
