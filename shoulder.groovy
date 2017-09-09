@@ -14,9 +14,12 @@ CSG shoulderMountA = corner.rotx(90).movey(15*25.4-shoulderInset)
 				.scalez(0.9)
 				.movex(shoulderPos)
 				.movez(25)
-				
-CSG plate = corner
+CSG plateBack = corner
 			.union(corner.movex(22*25.4))
+			.union (shoulder.movex(shoulderPos))
+			.hull()				
+CSG plate = corner
+			//.union(corner.movex(22*25.4))
 			.union (shoulder.movex(shoulderPos))
 			.hull()
 CSG upper = new Cube(10000).toCSG().toZMin()
@@ -79,5 +82,12 @@ shoulderMountA.setManufacturing({ toMfg ->
 			.toYMin()
 			.toZMin()
 })
+plateBack=plateBack.movez(-40)
+plateBack.setManufacturing({ toMfg ->
+	return toMfg
+			.toXMin()
+			.toYMin()
+			.toZMin()
+})
 
-return[ plate,chest,shoulderMountA,shoulderMountB]
+return[ plate,chest,shoulderMountA,shoulderMountB,plateBack]
