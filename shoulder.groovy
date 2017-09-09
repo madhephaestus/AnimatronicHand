@@ -1,5 +1,5 @@
 LengthParameter thickness 		= new LengthParameter("Material Thickness",5.1,[25.4,1])
-
+thickness.setMM(4.95)
 CSG corner =new Cylinder(2.5*25.4,2.5*25.4,thickness.getMM(),(int)30).toCSG() // a one line Cylinder
 double shoulderPos = 17*25.4
 double soulderSeperation = 15*25.4
