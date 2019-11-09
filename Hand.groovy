@@ -1,4 +1,3 @@
-
 CSGDatabase.clear()
 class handMaker{
 	LengthParameter numberFingers 	= new LengthParameter("Number of Fingers",4,[8,1])
